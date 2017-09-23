@@ -1,0 +1,9 @@
+*.pyc
+data
+*.log
+*.meta
+*.index
+*.pbtxt
+*.nawi
+checkpoint/
+tmp

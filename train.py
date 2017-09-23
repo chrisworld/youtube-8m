@@ -93,6 +93,7 @@ if __name__ == "__main__":
   # Other flags.
   flags.DEFINE_integer("num_readers", 8,
                        "How many threads to use for reading input files.")
+  flags.DEFINE_integer("num_classes", 4716, "Number of labels aka classes")
   flags.DEFINE_string("optimizer", "AdamOptimizer",
                       "What optimizer class to use.")
   flags.DEFINE_float("clip_gradient_norm", 1.0, "Norm to clip gradients to.")
@@ -564,10 +565,10 @@ def get_reader():
       FLAGS.feature_names, FLAGS.feature_sizes)
 
   if FLAGS.frame_features:
-    reader = readers.YT8MFrameFeatureReader(
+    reader = readers.YT8MFrameFeatureReader( num_classes=FLAGS.num_classes,
         feature_names=feature_names, feature_sizes=feature_sizes)
   else:
-    reader = readers.YT8MAggregatedFeatureReader(
+    reader = readers.YT8MAggregatedFeatureReader( num_classes=FLAGS.num_classes,
         feature_names=feature_names, feature_sizes=feature_sizes)
 
   return reader

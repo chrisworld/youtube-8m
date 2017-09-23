@@ -26,6 +26,8 @@ from tensorflow import flags
 from tensorflow import gfile
 from tensorflow import logging
 import utils
+import csv
+import numpy as np
 
 FLAGS = flags.FLAGS
 
@@ -64,6 +66,7 @@ if __name__ == "__main__":
   # Other flags.
   flags.DEFINE_integer("num_readers", 8,
                        "How many threads to use for reading input files.")
+  flags.DEFINE_integer("num_classes", 4716, "Number of labels aka classes")
   flags.DEFINE_boolean("run_once", False, "Whether to run eval only once.")
   flags.DEFINE_integer("top_k", 20, "How many predictions to output per video.")
 
@@ -167,6 +170,16 @@ def build_graph(reader,
   tf.add_to_collection("labels", tf.cast(labels_batch, tf.float32))
   tf.add_to_collection("summary_op", tf.summary.merge_all())
 
+#-----------------------------------------------------------------------
+# load csv labels from
+# format: {display_name : index}
+#-----------------------------------------------------------------------
+def load_csv_labels(label_csv_path):
+    with open(label_csv_path, mode='r') as infile:
+        reader = csv.reader(infile)
+        label_map = {rows[0]: rows[2] for rows in reader
+            if rows[0] not in ['index']}
+    return label_map
 
 def evaluation_loop(video_id_batch, prediction_batch, label_batch, loss,
                     summary_op, saver, summary_writer, evl_metrics,
@@ -226,8 +239,26 @@ def evaluation_loop(video_id_batch, prediction_batch, label_batch, loss,
       examples_processed = 0
       while not coord.should_stop():
         batch_start_time = time.time()
-        _, predictions_val, labels_val, loss_val, summary_val = sess.run(
-            fetches)
+        video_id_val, predictions_val, labels_val, loss_val, summary_val \
+            = sess.run(fetches)
+        # Debug
+        for v, v_id in enumerate(video_id_val):
+            print "\nyoutube video id: ",video_id_val[v]
+            l_map = load_csv_labels('./data/audioset/class_labels_indices.csv')
+            print "labels:"
+            for i, label in enumerate(labels_val[v]):
+                if label == 1:
+                    print '... num: ',i,'  label: ', l_map[str(i)]
+            k = 5
+            print "top %i predictions:"%k
+            top_pred_indices = np.argpartition(predictions_val[v], -k)[-k:]
+            #print top_pred_indices
+            for pred in top_pred_indices:
+                print '... num: ',pred,'  label: ', l_map[str(pred)]
+            #for i, pred in enumerate(predictions_val[v]):
+            #    if pred > 0.5:
+            #        print '... num: ',i,'  label: ', l_map[str(i)]
+        #
         seconds_per_batch = time.time() - batch_start_time
         example_per_second = labels_val.shape[0] / seconds_per_batch
         examples_processed += labels_val.shape[0]
@@ -278,11 +309,14 @@ def evaluate():
         FLAGS.feature_names, FLAGS.feature_sizes)
 
     if FLAGS.frame_features:
-      reader = readers.YT8MFrameFeatureReader(feature_names=feature_names,
+      reader = readers.YT8MFrameFeatureReader(num_classes=FLAGS.num_classes,
+                                              feature_names=feature_names,
                                               feature_sizes=feature_sizes)
     else:
-      reader = readers.YT8MAggregatedFeatureReader(feature_names=feature_names,
-                                                   feature_sizes=feature_sizes)
+      reader = readers.YT8MAggregatedFeatureReader(
+        num_classes=FLAGS.num_classes,
+        feature_names=feature_names,
+        feature_sizes=feature_sizes)
 
     model = find_class_by_name(FLAGS.model,
         [frame_level_models, video_level_models])()
@@ -330,4 +364,3 @@ def main(unused_argv):
 
 if __name__ == "__main__":
   app.run()
-

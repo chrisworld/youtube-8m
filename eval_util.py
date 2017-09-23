@@ -38,9 +38,12 @@ def calculate_hit_at_one(predictions, actuals):
     float: The average hit at one across the entire batch.
   """
   top_prediction = numpy.argmax(predictions, 1)
+  print "top pred: ",top_prediction
+  print "range: ", numpy.arange(actuals.shape[0])
   hits = actuals[numpy.arange(actuals.shape[0]), top_prediction]
+  print "hits: ", hits
+  print "average: ", numpy.average(hits)
   return numpy.average(hits)
-
 
 def calculate_precision_at_equal_recall_rate(predictions, actuals):
   """Performs a local (numpy) calculation of the PERR.

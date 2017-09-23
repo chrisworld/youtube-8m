@@ -65,6 +65,7 @@ if __name__ == '__main__':
   # Other flags.
   flags.DEFINE_integer("num_readers", 1,
                        "How many threads to use for reading input files.")
+  flags.DEFINE_integer("num_classes", 4716, "Number of labels aka classes")
   flags.DEFINE_integer("top_k", 20,
                        "How many predictions to output per video.")
 
@@ -184,10 +185,12 @@ def main(unused_argv):
       FLAGS.feature_names, FLAGS.feature_sizes)
 
   if FLAGS.frame_features:
-    reader = readers.YT8MFrameFeatureReader(feature_names=feature_names,
+    reader = readers.YT8MFrameFeatureReader(num_classes=FLAGS.num_classes,
+                                            feature_names=feature_names,
                                             feature_sizes=feature_sizes)
   else:
-    reader = readers.YT8MAggregatedFeatureReader(feature_names=feature_names,
+    reader = readers.YT8MAggregatedFeatureReader(num_classes=FLAGS.num_classes,
+                                                 feature_names=feature_names,
                                                  feature_sizes=feature_sizes)
 
   if FLAGS.output_file is "":
