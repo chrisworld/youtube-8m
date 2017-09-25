@@ -7,3 +7,4 @@ data
 *.nawi
 checkpoint/
 tmp
+bin
