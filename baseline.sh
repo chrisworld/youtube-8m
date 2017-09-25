@@ -74,7 +74,7 @@ exec > >(tee -a ${log_file} )
 exec 2> >(tee -a ${log_file} >&2)
 
 # baseline info
-echo "Baseline with ${num_epoch} epochs and ${model}"
+echo "Baseline with ${num_epoch} epochs and ${model} with set: ${train_folder}"
 python2 --version
 python2 -c 'import tensorflow as tf; print "tensorflow version: ", tf.__version__'
 
