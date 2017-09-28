@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export HOME="/srv/tmp/${USER}"
+#export HOME="/srv/tmp/${USER}"
+export HOME="/clusterFS/home/student/${USER}"
 
 # miniconda base dir
 _conda_base_dir="${HOME}"
@@ -137,15 +138,15 @@ model_dir=$path_root/tmp/yt8m
 #path_dataset_eval=$path_root/audioset/yt8m_features/test
 path_dataset=$path_root/data/audioset/
 #train_folder=$path_dataset/bal_train
-#train_folder=unbal_train
-train_folder=bal_train
+train_folder=unbal_train
+#train_folder=bal_train
 eval_folder=eval
 path_dataset_train=${path_dataset}${train_folder}
 path_dataset_eval=${path_dataset}${eval_folder}
 path_log=$path_root/logs
 
 # variables
-batch_size=128
+batch_size=64
 num_labels=527
 
 # functions
@@ -211,7 +212,7 @@ if [ $1 = "-train" ]
 then
   echo "train"
   # remove tmp files
-  rm -rf $model_dir
+  rm -rf ${model_dir}/${model}
   python $path_src/train.py --feature_names="audio_embedding" --feature_sizes="128" --train_data_pattern=$path_dataset_train/*.tfrecord --train_dir=$model_dir/$model --frame_features=True --model=$model --num_epochs=$num_epoch --batch_size=$batch_size --num_classes=$num_labels
 elif [ $1 = "-eval" ]
 then

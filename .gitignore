@@ -8,3 +8,4 @@ data
 checkpoint/
 tmp
 bin
+g++
