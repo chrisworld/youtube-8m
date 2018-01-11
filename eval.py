@@ -242,7 +242,9 @@ def evaluation_loop(video_id_batch, prediction_batch, label_batch, loss,
         video_id_val, predictions_val, labels_val, loss_val, summary_val \
             = sess.run(fetches)
         # Debug
-        """
+        #"""
+        print "predictions_val shape: ", predictions_val.shape
+        print "predictions_val sum: ", sum(predictions_val)
         for v, v_id in enumerate(video_id_val):
             print "\nyoutube video id: ",video_id_val[v]
             l_map = load_csv_labels('./data/audioset/class_labels_indices.csv')
@@ -259,7 +261,7 @@ def evaluation_loop(video_id_batch, prediction_batch, label_batch, loss,
             #for i, pred in enumerate(predictions_val[v]):
             #    if pred > 0.5:
             #        print '... num: ',i,'  label: ', l_map[str(i)]
-        """
+        #"""
         #
         seconds_per_batch = time.time() - batch_start_time
         example_per_second = labels_val.shape[0] / seconds_per_batch

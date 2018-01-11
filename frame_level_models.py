@@ -211,6 +211,9 @@ class LstmModel(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       'batch_size' x 'num_classes'.
     """
+    # Debug
+    print "vocab_size: ", vocab_size
+    
     lstm_size = FLAGS.lstm_cells
     number_of_layers = FLAGS.lstm_layers
 

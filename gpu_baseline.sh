@@ -1,4 +1,8 @@
 #!/bin/bash
+#SBATCH --time=20
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=100
+#SBATCH --gres=gpu:1
 
 #export HOME="/srv/tmp/${USER}"
 export HOME="/clusterFS/home/student/${USER}"
@@ -141,6 +145,7 @@ path_dataset=$path_root/data/audioset/
 train_folder=unbal_train
 #train_folder=bal_train
 eval_folder=eval
+#eval_folder=eval_show
 path_dataset_train=${path_dataset}${train_folder}
 path_dataset_eval=${path_dataset}${eval_folder}
 path_log=$path_root/logs
@@ -154,7 +159,7 @@ usage ()
 {
   echo "Usage:"
   echo "  parameters: -train or -eval   -logistic or -lstm   num_epochs"
-  echo "  example: ./baseline -train -lstm 100"
+  echo "  example: ./gpu_baseline -train -lstm 100"
   exit
 }
 

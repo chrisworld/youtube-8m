@@ -9,15 +9,15 @@ path_src=.
 model_dir=$path_root/tmp/yt8m
 path_dataset=$path_root/data/audioset/
 #train_folder=unbal_train
-#eval_folder=eval_show
+eval_folder=eval_show
 train_folder=bal_train
-eval_folder=eval
+#eval_folder=eval
 path_dataset_train=${path_dataset}${train_folder}
 path_dataset_eval=${path_dataset}${eval_folder}
 path_log=${path_root}/logs
 
 # variables
-batch_size=1024
+batch_size=64
 num_labels=527
 
 # functions
