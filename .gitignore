@@ -9,3 +9,6 @@ checkpoint/
 tmp
 bin
 g++
+*.slurm
+*.stdout
+*.out
