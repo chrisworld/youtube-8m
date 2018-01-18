@@ -96,8 +96,19 @@ class MoeModel(models.BaseModel):
         expert_activations,
         [-1, num_mixtures]))  # (Batch * #Labels) x num_mixtures
 
+    # Debug
+    print "model_input: ", model_input
+    #print "gate activation: ", gate_activations
+    #print "expert activation: ", expert_activations
+    #print "gating_distribution: ", gating_distribution
+    #print "expert_distribution: ", expert_distribution
+
     final_probabilities_by_class_and_batch = tf.reduce_sum(
         gating_distribution[:, :num_mixtures] * expert_distribution, 1)
     final_probabilities = tf.reshape(final_probabilities_by_class_and_batch,
                                      [-1, vocab_size])
+
+    #print "final_probabilities_by_class_and_batch: ", final_probabilities_by_class_and_batch
+    #print "final_probabilities: ", final_probabilities
+
     return {"predictions": final_probabilities}

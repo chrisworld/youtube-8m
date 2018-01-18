@@ -87,9 +87,15 @@ def calculate_gap(predictions, actuals, top_k=20):
   Returns:
     float: The global average precision.
   """
+  top_k=50
   gap_calculator = ap_calculator.AveragePrecisionCalculator()
   sparse_predictions, sparse_labels, num_positives = top_k_by_class(predictions, actuals, top_k)
+  print "\nsparse_predictions: ", sparse_predictions
+  print "\nsparse_labels: ", sparse_labels
+  print "\nnum_positives: ", num_positives
+
   gap_calculator.accumulate(flatten(sparse_predictions), flatten(sparse_labels), sum(num_positives))
+  print "\ngap_calculator.peek_ap_at_n(): ", gap_calculator.peek_ap_at_n()
   return gap_calculator.peek_ap_at_n()
 
 

@@ -74,12 +74,23 @@ class FrameLevelLogisticModel(models.BaseModel):
 
     denominators = tf.reshape(
         tf.tile(num_frames, [1, feature_size]), [-1, feature_size])
+
+    # sum features / frame_size, for each feature and batch
     avg_pooled = tf.reduce_sum(model_input,
                                axis=[1]) / denominators
 
     output = slim.fully_connected(
         avg_pooled, vocab_size, activation_fn=tf.nn.sigmoid,
         weights_regularizer=slim.l2_regularizer(1e-8))
+
+    # Debug
+    print "\nmodel_input: ", model_input
+    print "num_frames: ", num_frames
+    print "feature_size: ", feature_size
+    print "denominators: ", denominators
+    print "avg_pooled: ", avg_pooled
+    print "output: ", output
+
     return {"predictions": output}
 
 class DbofModel(models.BaseModel):
