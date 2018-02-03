@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #export HOME="/srv/tmp/${USER}"
-export HOME="/clusterFS/home/student/${USER}"
+#export USER="cwalter"
+export HOME="/clusterFS/home/student/cwalter"
 
 # miniconda base dir
 _conda_base_dir="${HOME}"
@@ -13,25 +14,35 @@ _conda_python_version="2.7"
 # python packages to install:
 # conda packages
 # _conda_install_packages="theano numpy pygpu matplotlib ipython jupyter jupyter_client"
-_conda_install_packages="theano numpy pygpu matplotlib"
+_conda_install_packages="theano numpy pygpu matplotlib scipy mkl nose sphinx"
 # pip packages
 # _pip_install_packages="PySingular==0.9.1 jupyter_kernel_singular"
-_pip_install_packages=""
+_pip_install_packages="parameterized"
 # pip whl URL
+if [ ${_conda_python_version:0:1} -eq 3 ]; then
+  #_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.2.1-cp35-cp35m-linux_x86_64.whl" # python 3.5
+  #_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp35-cp35m-linux_x86_64.whl"
+  _pip_install_whl="https://pypi.python.org/packages/72/e8/ff6c2b9377d52a7a6b4edaaecc4f09a43a461ff7c9091bdc30eae0836460/tensorflow_gpu-1.5.0rc1-cp35-cp35m-manylinux1_x86_64.whl"
+else
+  #_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.2.1-cp27-none-linux_x86_64.whl"  # python 2.7
+  #_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.4.1-cp27-none-linux_x86_64.whl"
+  _pip_install_whl="https://pypi.python.org/packages/3b/10/e538bbf1a63c7aab2fa48edd2342ca14f46ac5ac686c3ac4ecc67e1d4b9a/tensorflow_gpu-1.5.0rc1-cp27-cp27mu-manylinux1_x86_64.whl"
+fi
 #_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.2.1-cp35-cp35m-linux_x86_64.whl" # python 3.5
- _pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.2.1-cp27-none-linux_x86_64.whl"  # python 2.7
+#_pip_install_whl="https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.2.1-cp27-none-linux_x86_64.whl"  # python 2.7
 
 # overwrite theano flags
-THEANO_FLAGS="mode=FAST_RUN,floatX=float32"
+#THEANO_FLAGS="mode=FAST_RUN,floatX=float32"
+THEANO_FLAGS="floatX=float32,gpuarray.preallocate=0.9,cxx=/usr/bin/clang++-3.8,dnn.library_path=/usr/lib/x86_64-linux-gnu"
 
 # we need to force g++ to clang-3.8 and THEANO_FLAGS="nvcc.flags=-ccbin=clang-3.8"
 # path to bin directory necessary to overwrite the compiler version
 # do not use a directory which is in your $PATH
-_bin_dir="bin"
+#_bin_dir="bin"
 # g++ binary name
 # no path component bacause used as THEANO_FLAGS="nvcc.flags=-ccbin=${_gpp}"
 # which ${_gpp} will get used for the g++ symlink in the bin folder ${_bin_dir}
-_gpp="clang++-3.8"
+#_gpp="clang++-3.8"
 
 
 # software requironments:
@@ -48,33 +59,42 @@ mkdir -p ${HOME} || exit 1
 
 # define custom environment
 # minimal $PATH for home
-export PATH=${_conda_base_dir}/miniconda2/bin:${HOME}/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+#export PATH=${_conda_base_dir}/miniconda2/bin:${HOME}/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+export PATH=${_conda_base_dir}/miniconda${_conda_python_version:0:1}/bin:${HOME}/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 
 
 # compile version hack:
-mkdir -p "${_bin_dir}"
-_bin_dir=$(readlink -f ${_bin_dir}) # get full path
-if [ ! -s "${_bin_dir}/g++" ]; then
-  ln -fs $(which ${_gpp}) ${_bin_dir}/g++
+if [ -n "${_bin_dir}" ]; then
+  mkdir -p "${_bin_dir}"
+  _bin_dir=$(readlink -f ${_bin_dir}) # get full path
+  if [ ! -s "${_bin_dir}/g++" ]; then
+    ln -fs $(which ${_gpp}) ${_bin_dir}/g++
+  fi
 fi
-THEANO_FLAGS+=",nvcc.flags=-ccbin=${_gpp}"
+# compile version hack:
+#mkdir -p "${_bin_dir}"
+#_bin_dir=$(readlink -f ${_bin_dir}) # get full path
+#if [ ! -s "${_bin_dir}/g++" ]; then
+#  ln -fs $(which ${_gpp}) ${_bin_dir}/g++
+#fi
+#THEANO_FLAGS+=",nvcc.flags=-ccbin=${_gpp}"
 
 export PATH=${_bin_dir}:${PATH}
 
 
 # python
 # install miniconda
-if [ ! -d ${_conda_base_dir}/miniconda2 ]; then
+if [ ! -d ${_conda_base_dir}/miniconda${_conda_python_version:0:1} ]; then
   if [ ! -f Miniconda2-latest-Linux-x86_64.sh ]; then
-    wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+    wget https://repo.continuum.io/miniconda/Miniconda${_conda_python_version:0:1}-latest-Linux-x86_64.sh
   fi
-  chmod +x ./Miniconda2-latest-Linux-x86_64.sh
-  ./Miniconda2-latest-Linux-x86_64.sh -b -f -p ${_conda_base_dir}/miniconda2
-  rm ./Miniconda2-latest-Linux-x86_64.sh
+  chmod +x ./Miniconda${_conda_python_version:0:1}-latest-Linux-x86_64.sh
+  ./Miniconda${_conda_python_version:0:1}-latest-Linux-x86_64.sh -b -f -p ${_conda_base_dir}/miniconda${_conda_python_version:0:1} 
+  rm ./Miniconda${_conda_python_version:0:1}-latest-Linux-x86_64.sh
   INSTALL=${INSTALL:-true}
 fi
 # setup virtual environment
-if [ ! -d "${_conda_base_dir}/miniconda2/envs/${_conda_env}" ]; then
+if [ ! -d "${_conda_base_dir}/miniconda${_conda_python_version:0:1}/envs/${_conda_env}" ]; then
   conda create --yes -q -n ${_conda_env} python=${_conda_python_version}
 fi
 # activate environment
@@ -125,7 +145,11 @@ echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
 echo "THEANO_FLAGS=${THEANO_FLAGS}"
 echo
 
-export THEANO_FLAGS="${THEANO_FLAGS}"
+####################
+# START: user code #
+####################
+
+#export THEANO_FLAGS="${THEANO_FLAGS}"
 
 # Paths
 path_root=.
@@ -138,8 +162,8 @@ model_dir=$path_root/tmp/yt8m
 #path_dataset_eval=$path_root/audioset/yt8m_features/test
 path_dataset=$path_root/data/audioset/
 #train_folder=$path_dataset/bal_train
-train_folder=unbal_train
-#train_folder=bal_train
+#train_folder=unbal_train
+train_folder=bal_train
 eval_folder=eval
 path_dataset_train=${path_dataset}${train_folder}
 path_dataset_eval=${path_dataset}${eval_folder}
@@ -220,4 +244,13 @@ then
   python $path_src/eval.py --feature_names="audio_embedding" --feature_sizes="128" --eval_data_pattern=$path_dataset_eval/*.tfrecord --train_dir=$model_dir/$model --frame_features=True --model=$model --run_once=True --num_epochs=$num_epoch --batch_size=$batch_size --num_classes=$num_labels
 else
   usage
+fi
+
+##################
+# END: user code #
+##################
+
+# clean up
+if [ -d "${THEANO_TMPDIR}" ]; then
+    rm -rf "${THEANO_TMPDIR}"
 fi

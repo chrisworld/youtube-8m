@@ -15,9 +15,9 @@
 """Provides functions to help with evaluating models."""
 import datetime
 import numpy
-
 from tensorflow.python.platform import gfile
-
+#import tensorflow as tf
+#from tensorflow import gfile
 import mean_average_precision_calculator as map_calculator
 import average_precision_calculator as ap_calculator
 

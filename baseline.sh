@@ -17,7 +17,8 @@ path_dataset_eval=${path_dataset}${eval_folder}
 path_log=${path_root}/logs
 
 # variables
-batch_size=1024
+#batch_size=1024
+batch_size=64
 num_labels=527
 
 # functions
