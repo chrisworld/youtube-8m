@@ -2,9 +2,9 @@ import os
 import sys
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-from scipy.interpolate import UnivariateSpline
-from matplotlib.pyplot import figure, show
+#import matplotlib.pyplot as plt
+#from scipy.interpolate import UnivariateSpline
+#from matplotlib.pyplot import figure, show
 
 import plotly.plotly as py
 from plotly.graph_objs import *
@@ -44,7 +44,7 @@ def parse(lines, set_='test', tag='Hit@1'):
             if set_ in l and tag in l and 'epoch ' in l and 'package 0' in l:
                 tag_pos = l.find(tag, l.find(set_ + ':')) + len(tag + ': ')
                 t = l[tag_pos : tag_pos + 6]
-                print "%s: %s" %(tag, t)
+                #print "%s: %s" %(tag, t)
                 data.append(float(t))
     except:
         print 'error parsing %s' % set_
@@ -59,7 +59,7 @@ def parseYT8M(lines, set_='test', tag='Hit@1'):
             if tag in l:
                 tag_pos = l.find(tag) + len(tag + ': ')
                 t = l[tag_pos : tag_pos + 4]
-                print "%s: %s" %(tag, t)
+                #print "%s: %s" %(tag, t)
                 data.append(float(t))
     except:
         print 'error parsing %s' % set_
@@ -77,21 +77,38 @@ if __name__ == "__main__":
     sets = args.sets.split(',')
     container = {}
     for f in files:
+        print "file: ", f
         for set_ in sets:
             #print '... loading %s' % os.path.basename(f)
-            print "set: ", set_
+            print "... set: ", set_
             print '... loading %s' % '../' + '/'.join(f.split('/')[-3:])
             lines = read(f)
             if 'yt8m' in f:
-                container['score'] = parseYT8M(lines, set_)
+                #container['score'] = parseYT8M(lines, set_)
+                #container[f] = parseYT8M(lines, set_, tag='Loss')
+                container[f] = parseYT8M(lines, set_, tag='Hit@1')
             else:
-                container['score'] = parse(lines, set_)
+                #container['score'] = parse(lines, set_)
+                container[f] = parseYT8M(lines, set_)
     
     print "sucess"
-    #print container['score']
-    step = range(len(container['score']))
-    #print step
-    trace0 = Scatter(y=container['score'], x=step)
-    data = Data([trace0])
-    
-py.plot(data, filename = 'basic-line')
+
+    # put data into the traces
+
+    #step = range(len(container['score']))
+    #trace0 = Scatter(y=container['score'], x=step)
+    #data = Data([trace0])
+
+    line_labels = ['Logistic', 'LSTM', 'GRU']
+    trace = []
+    label = 0;
+    for f in files:
+        step = range(len(container[f]))
+        #trace.append(Scatter(y=container[f], x=step, name=f, lines=1.3))
+        trace.append({'type': 'scatter', 'mode': 'lines', 'name': line_labels[label], 'x': step, 'y': container[f], 'line': {'shape': 'spline', 'smoothing': 1}})
+        label = label + 1
+
+    data = Data(trace)
+
+py.plot(data, filename = 'Hit_bal_100e')
+#py.plot(data, filename = 'Loss_unbal_3e')
