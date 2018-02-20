@@ -105,10 +105,15 @@ if __name__ == "__main__":
     for f in files:
         step = range(len(container[f]))
         #trace.append(Scatter(y=container[f], x=step, name=f, lines=1.3))
-        trace.append({'type': 'scatter', 'mode': 'lines', 'name': line_labels[label], 'x': step, 'y': container[f], 'line': {'shape': 'spline', 'smoothing': 1}})
+
+        # line plot
+        #trace.append({'type': 'scatter', 'mode': 'lines', 'name': line_labels[label], 'x': step, 'y': container[f], 'line': {'shape': 'spline', 'smoothing': 1}})
+        
+        # box plot
+        trace.append({'type': 'box', 'name': line_labels[label], 'y': container[f]})
         label = label + 1
 
     data = Data(trace)
 
-py.plot(data, filename = 'Hit_bal_100e')
+py.plot(data, filename = 'Hit_bal_100e_box')
 #py.plot(data, filename = 'Loss_unbal_3e')
