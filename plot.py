@@ -84,21 +84,15 @@ if __name__ == "__main__":
             print '... loading %s' % '../' + '/'.join(f.split('/')[-3:])
             lines = read(f)
             if 'yt8m' in f:
-                #container['score'] = parseYT8M(lines, set_)
-                #container[f] = parseYT8M(lines, set_, tag='Loss')
-                container[f] = parseYT8M(lines, set_, tag='Hit@1')
+                container[f] = parseYT8M(lines, set_, tag='Loss')
+                #container[f] = parseYT8M(lines, set_, tag='Hit@1')
             else:
                 #container['score'] = parse(lines, set_)
-                container[f] = parseYT8M(lines, set_)
+                container[f] = parse(lines, set_)
     
     print "sucess"
 
     # put data into the traces
-
-    #step = range(len(container['score']))
-    #trace0 = Scatter(y=container['score'], x=step)
-    #data = Data([trace0])
-
     line_labels = ['Logistic', 'LSTM', 'GRU']
     trace = []
     label = 0;
@@ -115,5 +109,8 @@ if __name__ == "__main__":
 
     data = Data(trace)
 
-py.plot(data, filename = 'Hit_bal_100e_box')
-#py.plot(data, filename = 'Loss_unbal_3e')
+py.plot(data, filename = 'Loss_unbal_3e_box')
+
+# call plot in terminal py2.7
+#python plot.py logs/exp3/yt8m_train_bal_train_FrameLevelLogisticModel_100epochs.log logs/exp3/yt8m_train_bal_train_LstmModel_100epochs.log logs/exp3/yt8m_train_bal_train_GRUModel_100epochs.log train
+#python plot.py logs/exp3/yt8m_train_unbal_train_FrameLevelLogisticModel_3epochs.log logs/exp3/yt8m_train_unbal_train_LstmModel_3epochs.log logs/exp3/yt8m_train_unbal_train_GRUModel_3epochs.log train
