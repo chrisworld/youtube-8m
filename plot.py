@@ -6,24 +6,12 @@ import argparse
 #from scipy.interpolate import UnivariateSpline
 #from matplotlib.pyplot import figure, show
 
+import plotly
 import plotly.plotly as py
 from plotly.graph_objs import *
 
-trace0 = Scatter(
-    x=[1, 2, 3, 4],
-    y=[10, 15, 13, 17]
-)
-trace1 = Scatter(
-    x=[1, 2, 3, 4],
-    y=[16, 5, 11, 9]
-)
-data = Data([trace0, trace1])
+plotly.tools.set_credentials_file(username='cworld91', api_key='GTKTdHiCZvvCPPNQydG7')
 
-#py.plot(data, filename = 'basic-line')
-
-
-
-# ------------------------------------------------------------------------------
 #---------------------------------------
 def read(path):
     lines = []
@@ -84,8 +72,8 @@ if __name__ == "__main__":
             print '... loading %s' % '../' + '/'.join(f.split('/')[-3:])
             lines = read(f)
             if 'yt8m' in f:
-                container[f] = parseYT8M(lines, set_, tag='Loss')
-                #container[f] = parseYT8M(lines, set_, tag='Hit@1')
+                #container[f] = parseYT8M(lines, set_, tag='Loss')
+                container[f] = parseYT8M(lines, set_, tag='Hit@1')
             else:
                 #container['score'] = parse(lines, set_)
                 container[f] = parse(lines, set_)
@@ -101,16 +89,18 @@ if __name__ == "__main__":
         #trace.append(Scatter(y=container[f], x=step, name=f, lines=1.3))
 
         # line plot
-        #trace.append({'type': 'scatter', 'mode': 'lines', 'name': line_labels[label], 'x': step, 'y': container[f], 'line': {'shape': 'spline', 'smoothing': 1}})
+        trace.append({'type': 'scatter', 'mode': 'lines', 'name': line_labels[label], 'x': step, 'y': container[f], 'line': {'shape': 'spline', 'smoothing': 1}})
         
         # box plot
-        trace.append({'type': 'box', 'name': line_labels[label], 'y': container[f]})
+        #trace.append({'type': 'box', 'name': line_labels[label], 'y': container[f]})
         label = label + 1
 
     data = Data(trace)
 
-py.plot(data, filename = 'Loss_unbal_3e_box')
+py.plot(data, filename = 'Hit_bal_3e_box_setup1')
 
 # call plot in terminal py2.7
 #python plot.py logs/exp3/yt8m_train_bal_train_FrameLevelLogisticModel_100epochs.log logs/exp3/yt8m_train_bal_train_LstmModel_100epochs.log logs/exp3/yt8m_train_bal_train_GRUModel_100epochs.log train
+#python plot.py logs/exp2/yt8m_train_bal_train_FrameLevelLogisticModel_100epochs.log logs/exp2/yt8m_train_bal_train_LstmModel_100epochs.log logs/exp2/yt8m_train_bal_train_GRUModel_100epochs.log train
+#python plot.py logs/exp3/yt8m_train_unbal_train_FrameLevelLogisticModel_3epochs.log logs/exp3/yt8m_train_unbal_train_LstmModel_3epochs.log logs/exp3/yt8m_train_unbal_train_GRUModel_3epochs.log train
 #python plot.py logs/exp3/yt8m_train_unbal_train_FrameLevelLogisticModel_3epochs.log logs/exp3/yt8m_train_unbal_train_LstmModel_3epochs.log logs/exp3/yt8m_train_unbal_train_GRUModel_3epochs.log train
